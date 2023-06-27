@@ -1,0 +1,31 @@
+Phenotype,Model,group,n_train,n_test,train_evr,test_evr,full_train_evr,full_test_evr
+SBP,Lasso,Overall,43556,18748,6.86%,4.31%,35.99%,33.09%
+SBP,Lasso,Black,10914,3674,3.74%,1.28%,14.82%,0.93%
+SBP,Lasso,Asian,4281,374,5.49%,1.08%,16.78%,4.79%
+SBP,Lasso,White,19853,10823,9.09%,5.61%,14.86%,7.12%
+SBP,Lasso,Hispanic,8027,3877,7.10%,4.04%,15.99%,8.38%
+DBP,Lasso,Overall,43472,18768,2.69%,1.99%,18.19%,19.00%
+DBP,Lasso,Black,10889,3657,1.37%,0.66%,1.78%,4.31%
+DBP,Lasso,Asian,4220,403,1.86%,1.53%,10.91%,2.24%
+DBP,Lasso,White,19786,10877,3.05%,1.75%,5.20%,2.04%
+DBP,Lasso,Hispanic,8093,3831,4.06%,3.99%,6.88%,10.90%
+SBP,XGBoost,Overall,43556,18748,59.30%,3.11%,72.03%,32.24%
+SBP,XGBoost,Black,10914,3674,58.90%,1.06%,51.91%,1.91%
+SBP,XGBoost,Asian,4281,374,58.71%,0.68%,55.23%,5.17%
+SBP,XGBoost,White,19853,10823,59.54%,4.25%,50.12%,7.14%
+SBP,XGBoost,Hispanic,8027,3877,59.67%,2.71%,51.16%,8.06%
+SBP,Linear Regression,Overall,43556,18748,7.81%,4.80%,36.65%,33.42%
+SBP,Linear Regression,Black,10914,3674,3.68%,0.90%,14.70%,0.76%
+SBP,Linear Regression,Asian,4281,374,6.50%,0.62%,17.34%,4.09%
+SBP,Linear Regression,White,19853,10823,10.72%,6.76%,15.98%,8.25%
+SBP,Linear Regression,Hispanic,8027,3877,7.92%,3.51%,16.35%,8.05%
+DBP,XGBoost,Overall,43472,18768,83.74%,2.49%,86.33%,19.41%
+DBP,XGBoost,Black,10889,3657,83.96%,0.54%,73.63%,4.36%
+DBP,XGBoost,Asian,4220,403,83.81%,1.83%,75.75%,2.73%
+DBP,XGBoost,White,19786,10877,83.32%,2.28%,74.22%,2.53%
+DBP,XGBoost,Hispanic,8093,3831,84.29%,5.17%,75.46%,11.70%
+DBP,Linear Regression,Overall,43472,18768,4.71%,2.55%,19.89%,19.46%
+DBP,Linear Regression,Black,10889,3657,2.17%,-0.03%,3.09%,4.97%
+DBP,Linear Regression,Asian,4220,403,4.01%,2.15%,12.66%,3.01%
+DBP,Linear Regression,White,19786,10877,5.74%,2.39%,7.92%,3.09%
+DBP,Linear Regression,Hispanic,8093,3831,6.31%,5.55%,9.07%,12.58%
