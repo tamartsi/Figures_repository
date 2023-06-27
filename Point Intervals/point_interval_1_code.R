@@ -8,7 +8,7 @@ PRS_vec <- c("PRSstd_sum_std", "PRSstd_gap_std", "PRSstd_mgb_std")
 OSA_strats <- c("Healthy_sleep", "Mild_OSA", "Mod_severe_OSA")
 
 #visualizations for separate files by sleep and PRS
-#first starting with 20230523_assoc_PRS_baseline_DM.csv
+#first starting with point_interval_1_data_1
 
 res1 <- read.csv("point_interval_1_data_1.csv")
 res1 <- res1 %>% filter(PRS %in% PRS_vec, stratum %in% OSA_strats)
@@ -31,7 +31,7 @@ p1 <- ggplot(res1, aes(x = stratum, y = OR, group = PRS, color = PRS)) +
   scale_color_manual(values = wes_palette("Darjeeling1"))
 p1
 
-#now using 20230523_assoc_PRS_incident_DM.csv
+#now using point_interval_1_data_2
 res2 <- read.csv("point_interval_1_data_2.csv")
 res2 <- res2 %>% filter(PRS %in% PRS_vec, stratum %in% OSA_strats)
 res2
@@ -53,7 +53,7 @@ p2 <- ggplot(res2, aes(x = stratum, y = IRR, group = PRS, color = PRS)) +
 p2
 
 
-#now using 20230523_assoc_PRS_incident_DM_among_normal_glycemic.csv
+#now using point_interval_1_data_3
 res3 <- read.csv("point_interval_1_data_3.csv")
 res3 <- res3 %>% filter(PRS %in% PRS_vec, stratum %in% OSA_strats)
 res3
@@ -74,7 +74,7 @@ p3 <- ggplot(res3, aes(x = stratum, y = IRR, group = PRS, color = PRS)) +
   scale_color_manual(values = wes_palette("Darjeeling1"))
 p3
 
-#now using 20230523_assoc_PRS_incident_DM_pre_DM_among_normal_glycemic.csv
+#now using point_interval_1_data_4
 res4 <- read.csv("point_interval_1_data_4.csv")
 res4 <- res4 %>% filter(PRS %in% PRS_vec, stratum %in% OSA_strats)
 res4
