@@ -1,0 +1,59 @@
+---
+title: "facet_heatmap"
+output: html_document
+date: "2025-01-07"
+---
+
+```{r libraries and data, include=FALSE}
+library(ggplot2)
+library(data.table)
+library(ggpmisc)
+library(ggpubr)
+
+temp <- fread("data_for_example_facet_heatmap.txt")
+
+```
+
+```{r plot v2}
+
+# The plot is complicated, but the code isn't!
+
+# The data here are the percent variance explained (PVE) by 2770 PRSs in a training set and in a testing set. 
+#   Some of the traits were very heritable and others less so, so the data were split into five quintiles
+#   according to their heritability, to see if that changed the ability of the training PVE to predict
+#   the testing PVE.
+
+p1 <- ggplot(data = temp, aes(x = PVE_training, y = PVE_testing)) +
+  # geom_hex is good for showing the density of points in an area of a scatter plot, with the color of each hex
+  #   indicating the density. 
+  # "after_stat" tells ggplot not to do anything with the data until some statistical procedure has been performed on it.
+  #   In this case, there are two procedures: first a count of the points in each hex, then a log transformation
+  #   of that count.
+  # Note that ggplot automatically adds a label to the legend explaining what transformations were done.
+  geom_hex(aes(fill = after_stat(log10(count)))) +
+  # if you want to put statistics about a correlation on the plot itself, stat_cor is a very easy way to do it.
+  #   Again, this uses "after_stat" to get the results of a procedure before putting those results on the chart.
+  stat_cor(aes(label = after_stat(rr.label)), method = "pearson") +
+  # geom_hline, geom_vline, and geom_abline are handy for emphasizing some line on a plot
+  geom_abline(slope = 1, intercept = 0, color = "black", linetype = "dotted", linewidth = 0.5) +
+  # facet_wrap is what you want when you need to produce one facet per level of a single variable.
+  #   To split your data into facets based on two or more variables, use facet_grid.
+  # Note that facet_wrap automatically labels each facet based on the levels in your data - to make these labels
+  #   informative, you can just change how the levels are named in your data, or create a new column with informative
+  #   labels.
+  facet_wrap(vars(heritability_quintile)) +
+  # You'll often want to customize colors. In a heatmap, it can be important to set the limits on the range so that
+  #   the min and max are as close as possible to the extremes of your color gradient. That makes the trends in the
+  #   data easier to see.
+  scale_fill_continuous(low="lightblue2", high="royalblue4", limits = c(0,3)) +
+  # if one unit on the x-axis is supposed to mean the same thing as one unit on the y-axis, you need to use coord_fixed().
+  coord_fixed() +
+  # changing the theme can go a long way toward prettifying a plot
+  theme_classic(base_size = 14) +
+  labs(x = "PVE for best PRS (training set)",
+        y = "PVE for best PRS (testing set)") 
+
+p1
+
+```
+
