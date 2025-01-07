@@ -1,0 +1,145 @@
+---
+title: "Forest Plot"
+author: "Leslie (ZW)"
+date: "2025-01-07"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(finalfit)
+library(knitr)
+library(forestploter)
+library(grid)
+library(gridExtra)
+```
+
+This code is for creating forest plot for multiple groups and phenotypes, with various annotations.
+
+```{r,fig.width=10,fig.height=8}
+# Read Data
+Fig<-read.csv('~/Desktop/Example_forest_data.csv')
+
+# Break up data by group and combine them together by phenotypes
+sub <- split(Fig, Fig$group) 
+bl <- sub[[1]] %>% dplyr::select(-c(group))
+names(bl) <- paste0('bl_', names(bl))
+mrs <- sub[[2]] %>% dplyr::select(-c(group)) 
+names(mrs) <- paste0('mrs_', names(mrs))
+ss <- sub[[3]]%>% dplyr::select(-c(group)) 
+names(ss) <- paste0('ss_', names(ss))
+ws <- sub[[4]] %>% dplyr::select(-c(group))
+names(ws) <- paste0('ws_', names(ws))
+Fig <- cbind(bl, mrs, ss, ws) %>% dplyr::select(-c(mrs_pheno,ss_pheno,ws_pheno))
+names(Fig)[1] <- 'Phenotype'
+
+# Add lines to separate phenotypes by categories
+Fig <- rbind(Fig, data.frame(Phenotype=c('Obstructive Sleep Apnea and Sleep Duration',
+                                             'Cognitive Function'),
+                              bl_coef=rep(NA,2), bl_p.val=rep(NA,2), bl_lower=rep(NA,2),
+                              bl_upper=rep(NA,2), bl_fdr=rep(NA,2), mrs_coef=rep(NA,2), 
+                              mrs_p.val=rep(NA,2), mrs_lower=rep(NA,2), mrs_upper=rep(NA,2), 
+                              mrs_fdr=rep(NA,2), ss_coef=rep(NA,2), ss_p.val=rep(NA,2), 
+                              ss_lower=rep(NA,2), ss_upper=rep(NA,2), ss_fdr=rep(NA,2), 
+                              ws_coef=rep(NA,2), ws_p.val=rep(NA,2), ws_lower=rep(NA,2),
+                              ws_upper=rep(NA,2), ws_fdr=rep(NA,2) ))
+
+row.names(Fig) <- 1:nrow(Fig)
+
+# Rearrange the rows
+Fig <- Fig[c(8,1:5,9,7,6),]
+row.names(Fig) <- 1:nrow(Fig)
+
+# Rename phenotypes as necessary
+Fig$Phenotype[c(2:6)]<-c('AHI','Minimum SpO2','Mean SpO2','% Time SpO2 <90','Sleep Duration')
+Fig$Phenotype[c(8:9)]<-c( 'Baseline', 'Cognitive Change')
+
+# Replace NA by space, otherwise NA will be transformed to carachter.
+Fig$Phenotype <- ifelse(is.na(Fig$bl_coef), 
+                      Fig$Phenotype,
+                      paste0("   ", Fig$Phenotype))
+
+# Round the numeric value, and set scientific writing style for p-values
+Fig$bl_coef <- round(Fig$bl_coef,3)
+Fig$mrs_coef <- round(Fig$mrs_coef,3)
+Fig$ss_coef <- round(Fig$ss_coef,3)
+Fig$ws_coef <- round(Fig$ws_coef,3)
+Fig$bl_fdr <- format(Fig$bl_fdr, scientific=TRUE, digit=2)
+Fig$mrs_fdr <- format(Fig$mrs_fdr, scientific=TRUE, digit=2)
+Fig$ss_fdr <- format(Fig$ss_fdr, scientific=TRUE, digit=2)
+Fig$ws_fdr <- format(Fig$ws_fdr, scientific=TRUE, digit=2)
+Fig$bl_p.val <- format(Fig$bl_p.val, scientific=TRUE, digit=2)
+Fig$mrs_p.val <- format(Fig$mrs_p.val, scientific=TRUE, digit=2)
+Fig$ss_p.val <- format(Fig$ss_p.val, scientific=TRUE, digit=2)
+Fig$ws_p.val <- format(Fig$ws_p.val, scientific=TRUE, digit=2)
+
+# Add two blank columns for CI
+Fig$`95% CI` <- paste(rep(" ", 50), collapse = " ")
+
+# Generate point estimation and 95% CI. Paste two CIs together and separate by line break.
+Fig$bl_lower <- round(Fig$bl_lower,3)
+Fig$mrs_lower <- round(Fig$mrs_lower,3)
+Fig$ss_lower <- round(Fig$ss_lower,3)
+Fig$ws_lower <- round(Fig$ws_lower,3)
+Fig$bl_upper <- round(Fig$bl_upper,4)
+Fig$mrs_upper <- round(Fig$mrs_upper,3)
+Fig$ss_upper <- round(Fig$ss_upper,3)
+Fig$ws_upper <- round(Fig$ws_upper,3)
+
+Fig$CI <- paste(sprintf("(%.2f, %.2f)", Fig$bl_lower, Fig$bl_upper), 
+                sprintf("(%.2f, %.2f)", Fig$mrs_lower, Fig$mrs_upper),
+                sprintf("(%.2f, %.2f)", Fig$ss_lower, Fig$ss_upper),
+                sprintf("(%.2f, %.2f)", Fig$ws_lower, Fig$ws_upper),
+                sep = "\n")
+
+# Repeat for beta estimate and p-values
+Fig$Beta <- paste(sprintf("%.2f", Fig$bl_coef),
+                sprintf("%.2f", Fig$mrs_coef),
+                sprintf("%.2f", Fig$ss_coef),
+                sprintf("%.2f", Fig$ws_coef),
+                sep = "\n")
+Fig$q.val <- paste(Fig$bl_fdr, Fig$mrs_fdr, Fig$ss_fdr, Fig$ws_fdr,sep = "\n")
+Fig$p.val <- paste(Fig$bl_p.val, Fig$mrs_p.val, Fig$ss_p.val, Fig$ws_p.val, sep = "\n")
+
+# Set NA to blank
+Fig$CI[grepl("NA", Fig$CI)] <- "" 
+Fig$Beta[grepl("NA", Fig$Beta)] <- "" 
+Fig$q.val[grepl("NA", Fig$q.val)] <- "" 
+Fig$p.val[grepl("NA", Fig$p.val)] <- "" # Any NA to blank
+
+############################# Create Forest plot
+
+# Set-up theme, legend name for different groups and color. For details one can check function help page and Vignettes for package 'forestploter'.
+tm <- forest_theme(base_size = 8,
+                   refline_lty = "solid",
+                   ci_pch = c(15, 18),
+                   ci_col = c("#762a83", "#AF0040","#377eb8","#4daf4a"),
+                   footnote_gp = gpar(col = "blue"),
+                   legend_name = "CRP Type",
+                   legend_value = c("Blood CRP", "MRS CRP", "PRS EUR",  "PRS wsum" ),
+                   vertline_lty = c("dashed", "dotted"),
+                   vertline_col = c("#d6604d", "#bababa")
+                   )
+
+# Generate plot
+names(Fig)[23]<-'95%CI' # set name for confidence interval column 
+plot <- forest(Fig[,c(1,24,23,26,25,22)], 
+            est = list(Fig$bl_coef,
+                       Fig$mrs_coef,
+                       Fig$ss_coef,
+                       Fig$ws_coef),
+            lower = list(Fig$bl_lower,
+                       Fig$mrs_lower,
+                         Fig$ss_lower,
+                        Fig$ws_lower), 
+            upper = list(Fig$bl_upper,
+                      Fig$mrs_upper,
+                         Fig$ss_upper,
+                        Fig$ws_upper),
+            ci_column = 6,
+            ref_line = 0, # 1 if plotting odds ratio
+            nudge_y = 0.24,
+            theme = tm)
+plot
+```
