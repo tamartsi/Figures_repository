@@ -127,4 +127,4 @@ forest_plot_w_info_1 + theme(legend.position="top")
 
 
 
-#ggsave(filename  = "Figures/Assoc_baseline_and_incident_DM_by_OSA_categories_forest_plot_NO_OSA_mgbPRSsum.pdf", width = 18, height = 8, device='pdf', dpi=600)
+ggsave(filename  = "/Users/yana/Documents/GitHub/Figures_repository/ForestPlots/sample_output.pdf", width = 18, height = 8, device='pdf', dpi=600)
