@@ -1,0 +1,75 @@
+---
+title: "20260407_Figure_Workshop"
+author: "Yu Zhang"
+date: "2026-04-07"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, include=FALSE}
+library(tidyverse)
+```
+
+```{r}
+set.seed(97) 
+n_samples <- 50
+
+# Simulating data for three groups with different means and variances
+simulated_data <- data.frame(
+  Group = factor(
+    rep(c("Control", "Treatment A", "Treatment B"), each = n_samples),
+    levels = c("Control", "Treatment A", "Treatment B") # Ordering the factors
+  ),
+  Expression = c(
+    rnorm(n_samples, mean = 5.0, sd = 1.0),  # Control
+    rnorm(n_samples, mean = 7.2, sd = 1.5),  # Treatment A
+    rnorm(n_samples, mean = 8.8, sd = 1.2)   # Treatment B
+  )
+)
+
+# Create the plot
+pub_plot <- ggplot(simulated_data, aes(x = Group, y = Expression, fill = Group)) +
+  
+  # A. Violin plot for overall density/distribution (made slightly transparent)
+  geom_violin(trim = FALSE, alpha = 0.3, color = NA) +
+  
+  # B. Boxplot for quartiles and median (narrowed to fit inside the violin)
+  geom_boxplot(width = 0.2, color = "black", alpha = 0.8, outlier.shape = NA) +
+  
+  # C. Jittered raw data points to show individual subject spread
+  geom_jitter(aes(color = Group), width = 0.15, size = 1.5, alpha = 0.6) +
+  
+  # D. Color palettes
+  scale_fill_manual(values = c("#E69F00", "#56B4E9", "#009E73")) +
+  scale_color_manual(values = c("#D55E00", "#0072B2", "#009E73")) +
+  
+  # E. Labeling
+  labs(
+    title = "Gene Expression by Experimental Group",
+    subtitle = "Response measured at 48 hours post-treatment",
+    x = "Experimental Cohort",
+    y = "Relative Expression Level"
+  ) +
+  
+  # F. Apply a clean theme
+  theme_classic(base_size = 14) +
+  theme(
+    legend.position = "none", # Removed legend since X-axis labels are sufficient
+    plot.title = element_text(face = "bold", hjust = 0.5, size = 16),
+    plot.subtitle = element_text(hjust = 0.5, size = 12, color = "gray30", margin = margin(b = 15)),
+    axis.text.x = element_text(face = "bold", color = "black", size = 12),
+    axis.text.y = element_text(color = "black", size = 11),
+    axis.title.x = element_text(margin = margin(t = 12), face = "bold"),
+    axis.title.y = element_text(margin = margin(r = 12), face = "bold"),
+    axis.line = element_line(linewidth = 0.8, color = "black"),
+    axis.ticks = element_line(linewidth = 0.8, color = "black")
+  )
+```
+
+```{r}
+# write.csv(simulated_data, "20260407_Violin_Plot_Random_Simulated_Data.csv", row.names = FALSE)
+```
+
